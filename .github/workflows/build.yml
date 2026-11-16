@@ -16,7 +16,7 @@ jobs:
       - name: host tools
         run: sudo apt-get update -q && sudo apt-get install -y -q unzip zip curl
       - name: pack
-        run: ./pack.sh
+        run: bash pack.sh
       - uses: actions/upload-artifact@v4
         with:
           name: NetBench
@@ -27,4 +27,4 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           ver=$(sed -n 's/^version=v//p' module/module.prop)
-          scripts/release.sh publish "out/NetBench-v${ver}.zip"
+          bash scripts/release.sh publish "out/NetBench-v${ver}.zip"
