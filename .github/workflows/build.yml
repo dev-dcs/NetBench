@@ -1,0 +1,30 @@
+name: build
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  pack:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: host tools
+        run: sudo apt-get update -q && sudo apt-get install -y -q unzip zip curl
+      - name: pack
+        run: ./pack.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NetBench
+          path: out/*.zip
+      - name: release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ver=$(sed -n 's/^version=v//p' module/module.prop)
+          scripts/release.sh publish "out/NetBench-v${ver}.zip"

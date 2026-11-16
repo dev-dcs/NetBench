@@ -1,0 +1,7 @@
+id=netbench
+name=NetBench
+version=v1.0.0
+versionCode=10000
+author=@Dev_DcS
+description=Network bench: Tailscale and EasyTier mesh VPNs, per-app internet blocking, TCP tuning (BBR/cake), ADB over Wi-Fi, and a VoLTE/VoWiFi toggle, all from a WebUI. Uses its own iptables chain so it stays out of other modules' way.
+updateJson=https://raw.githubusercontent.com/dev-dcs/NetBench/main/update.json

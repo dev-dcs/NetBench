@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>NetBench</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <h1>NetBench</h1>
+  <span class="pill" id="ver">…</span>
+</header>
+
+<main>
+  <!-- Status -->
+  <section class="view active" id="view-status">
+    <div class="card"><h2>Overview</h2><pre id="status" class="mono">…</pre></div>
+    <div class="card">
+      <h2>Updates</h2>
+      <div id="update-line" class="muted">not checked</div>
+      <button class="btn" id="check-update">Check now</button>
+    </div>
+  </section>
+
+  <!-- Apps -->
+  <section class="view" id="view-apps">
+    <div class="card">
+      <h2>Block internet per app</h2>
+      <div class="muted small">Blocks an app's traffic through NetBench's own iptables chain. Reversible.</div>
+      <div class="row-add">
+        <input type="text" id="add-pkg" placeholder="package name or uid" autocomplete="off">
+        <button class="btn small" id="btn-add">Block</button>
+      </div>
+      <div id="blocked" class="list">…</div>
+    </div>
+    <div class="card">
+      <div class="row-between"><h2>Installed apps</h2><button class="btn tiny" id="load-apps">Load</button></div>
+      <input type="search" id="app-filter" placeholder="filter…" class="filter" hidden>
+      <div id="apps" class="list muted small">tap Load to list third-party apps</div>
+    </div>
+  </section>
+
+  <!-- Network -->
+  <section class="view" id="view-net">
+    <div class="card">
+      <h2>TCP tuning</h2>
+      <div class="muted small" id="tcp-now">…</div>
+      <label class="setting col"><span>Congestion control</span>
+        <select id="tcp-cc"></select></label>
+      <label class="setting col"><span>Default qdisc</span>
+        <select id="tcp-qdisc">
+          <option value="">(leave as is)</option>
+          <option>fq_codel</option><option>cake</option><option>fq</option><option>pfifo_fast</option>
+        </select></label>
+      <button class="btn" id="tcp-apply">Apply</button>
+    </div>
+    <div class="card">
+      <h2>ADB over Wi-Fi</h2>
+      <div class="muted small">Exposes adb on your network while on. Turn it off when you're done.</div>
+      <div class="row-between">
+        <span id="adb-state">…</span>
+        <label class="inline">port <input type="number" id="adb-port" value="5555" min="1024" max="65535"></label>
+      </div>
+      <div class="sheet-actions">
+        <button class="btn" id="adb-on">Turn on</button>
+        <button class="btn ghost" id="adb-off">Turn off</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- VPN -->
+  <section class="view" id="view-vpn">
+    <div class="card">
+      <h2>Tailscale</h2>
+      <pre id="ts-status" class="mono small">…</pre>
+      <div class="sheet-actions">
+        <button class="btn small" id="ts-start">Start</button>
+        <button class="btn small" id="ts-up">Log in</button>
+        <button class="btn ghost small" id="ts-stop">Stop</button>
+      </div>
+      <div class="muted small" id="ts-auth"></div>
+    </div>
+    <div class="card">
+      <h2>EasyTier</h2>
+      <label class="setting col"><span>easytier-core arguments</span>
+        <input type="text" id="et-args" placeholder="--network-name x --network-secret y" autocomplete="off"></label>
+      <pre id="et-status" class="mono small">…</pre>
+      <div class="sheet-actions">
+        <button class="btn small" id="et-start">Start</button>
+        <button class="btn ghost small" id="et-stop">Stop</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cellular -->
+  <section class="view" id="view-cell">
+    <div class="card">
+      <h2>VoLTE / VoWiFi</h2>
+      <p class="muted small">A light switch over the common IMS override properties. It depends on
+        your ROM and carrier — on some devices it enables VoLTE/VoWiFi, on others it does nothing.
+        No radio identities are touched. Reboot or toggle airplane mode to apply.</p>
+      <label class="setting"><span>Enable VoLTE/VoWiFi overrides</span><input type="checkbox" id="ims-toggle"></label>
+      <pre id="ims-status" class="mono small"></pre>
+    </div>
+    <div class="card small muted">
+      <h2>Settings</h2>
+      <label class="setting"><span>Check for updates on boot</span><input type="checkbox" id="opt-update"></label>
+      <button class="btn tiny" id="save-settings">Save</button>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs">
+  <button data-view="status" class="active">Status</button>
+  <button data-view="apps">Apps</button>
+  <button data-view="net">Network</button>
+  <button data-view="vpn">VPN</button>
+  <button data-view="cell">Cellular</button>
+</nav>
+
+<div class="snack" id="snack"></div>
+<script src="app.js"></script>
+</body>
+</html>

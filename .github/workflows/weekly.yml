@@ -1,0 +1,52 @@
+name: weekly
+
+# Weekly: roll Tailscale + EasyTier to upstream and, if either moved, cut a
+# patch release. build.yml packs + releases on the pushed tag.
+
+on:
+  schedule:
+    - cron: '47 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: release even if nothing moved
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly
+  cancel-in-progress: false
+
+jobs:
+  roll:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - name: bump pinned tools
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: scripts/bump.sh | tee bump.txt
+      - name: decide
+        id: d
+        run: |
+          if ! git diff --quiet -- prebuilts.conf || [ "${{ inputs.force }}" = "true" ]; then
+            echo "go=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "go=0" >> "$GITHUB_OUTPUT"; echo "Nothing moved." >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: tag a release
+        if: steps.d.outputs.go == '1'
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          scripts/release.sh bump patch
+          ver=$(sed -n 's/^version=v//p' module/module.prop)
+          { echo "## v$ver"; echo; sed 's/^/- /' bump.txt; echo; cat CHANGELOG.md; } > CHANGELOG.new
+          mv CHANGELOG.new CHANGELOG.md
+          git add prebuilts.conf module/module.prop CHANGELOG.md
+          git commit -m "weekly: roll tools, v$ver"
+          git tag "v$ver"; git push origin HEAD:${{ github.ref_name }}; git push origin "v$ver"
